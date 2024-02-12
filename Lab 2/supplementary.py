@@ -37,7 +37,7 @@ class Capture:
         height = int(cap.get(4))
         width = int(cap.get(3))
 
-        fourcc = cv.VideoWriter_fourcc(*'mp4v')
+        fourcc = cv.VideoWriter.fourcc(*'mp4v')
         out = cv.VideoWriter(f'{self.newname}.mp4', fourcc, 60.0, (width, height))
 
         while cap.isOpened():
