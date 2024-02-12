@@ -2,7 +2,10 @@ import cv2 as cv
 
 cap = cv.VideoCapture(0)
 
-fourcc = cv.VideoWriter_fourcc(*'mp4v')
+
+fourcc = cv.VideoWriter.fourcc(*'mp4v')
+
+
 out = cv.VideoWriter('output1.mp4', fourcc, 20.0, (640, 480))
 
 while (cap.isOpened()):
@@ -12,6 +15,7 @@ while (cap.isOpened()):
         print("Can't recieve frame (stream end?). Exitting...")
         break
 
+    #   .write() writes the next frame to video file
     out.write(frame)
 
     cv.imshow('frame',frame)
