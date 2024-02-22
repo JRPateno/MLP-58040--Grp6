@@ -35,6 +35,7 @@ def update(i):
     Thread(target=lambda: im3.set_data(grab_frame(cap1, 3))).start()
     Thread(target=lambda: im4.set_data(grab_frame(cap1, 4))).start()
 
+
 row = 2
 column = 2
 
