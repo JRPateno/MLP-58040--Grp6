@@ -22,7 +22,7 @@ def grab_frame(cap, switch):
             return cv.convertScaleAbs(sobelx)
 
         case 3:
-            return cv.Canny(blur, 100, 200)
+            return cv.Canny(img, 100, 200)
 
         case 4:
             laplacian = cv.Laplacian(blur, 5, cv.CV_64F)
@@ -46,10 +46,10 @@ ax1 = plt.subplot(row, column, 1)
 plt.axis('off'), plt.title('Original')
 
 ax2 = plt.subplot(row, column, 2)
-plt.axis('off'), plt.title('Sobel')
+plt.axis('off'), plt.title('Sobel Edge Detection')
 
 ax3 = plt.subplot(row, column, 3)
-plt.axis('off'), plt.title('Canny')
+plt.axis('off'), plt.title('Canny Edge Detection')
 
 ax4 = plt.subplot(row, column, 4)
 plt.axis('off'), plt.title('Laplacian')
