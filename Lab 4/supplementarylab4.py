@@ -1,32 +1,66 @@
 import cv2 as cv
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
+from matplotlib.animation import FuncAnimation
+from threading import Thread
 
-cap = cv.VideoCapture(0)
 
-if not cap.isOpened():
-    print('Cannot open camera')
-    exit()
-
-fig = plt.subplots()
-
-while True:
+def grab_frame(cap, switch):
     ret, frame = cap.read()
-    if not ret:
-        print('Can\'t recieve frame (stream end?). Exiting...')
-        break
+    img = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
 
-    gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-    # blur = cv.blur(frame, (5, 5))
-    blur = cv.GaussianBlur(gray, (5, 5), 0)
-    # edges = cv.Canny(frame, 100, 200)
+    # blur = cv.blur(img, (4, 4))
+    # blur = cv.GaussianBlur(img, (5, 5), 0)
+    # blur = cv.medianBlur(img, 5)
+    blur = cv.bilateralFilter(img, 9, 75, 75)
 
-    sobelxy = cv.Sobel(src=blur, ddepth=cv.CV_64F, dx=1, dy=0, ksize=5)
-    filtered_image_xy = cv.convertScaleAbs(sobelxy)
+    match switch:
+        case 1:
+            return img
 
-    test = cv.imshow('frame', filtered_image_xy)
-    if cv.waitKey(1) == ord('q'):
-        break
+        case 2:
+            sobelx = cv.Sobel(src=blur, ddepth=cv.CV_64F, dx=1, dy=1, ksize=5)
+            return cv.convertScaleAbs(sobelx)
 
-# plt.subplot(221), plt.imshow(img, cmap='gray'), plt.title('original')
+        case 3:
+            return cv.Canny(blur, 100, 200)
 
+        case 4:
+            laplacian = cv.Laplacian(blur, 5, cv.CV_64F)
+            return cv.convertScaleAbs(laplacian)
+
+
+def update(i):
+    Thread(target=lambda: im1.set_data(grab_frame(cap1, 1))).start()
+    Thread(target=lambda: im2.set_data(grab_frame(cap1, 2))).start()
+    Thread(target=lambda: im3.set_data(grab_frame(cap1, 3))).start()
+    Thread(target=lambda: im4.set_data(grab_frame(cap1, 4))).start()
+
+row = 2
+column = 2
+
+cap1 = cv.VideoCapture(0)
+
+
+ax1 = plt.subplot(row, column, 1)
+plt.axis('off'), plt.title('Original')
+
+ax2 = plt.subplot(row, column, 2)
+plt.axis('off'), plt.title('Sobel')
+
+ax3 = plt.subplot(row, column, 3)
+plt.axis('off'), plt.title('Canny')
+
+ax4 = plt.subplot(row, column, 4)
+plt.axis('off'), plt.title('Laplacian')
+
+
+im1 = ax1.imshow(grab_frame(cap1, 1))
+im2 = ax2.imshow(grab_frame(cap1, 2), cmap='gray')
+im3 = ax3.imshow(grab_frame(cap1, 3), cmap='gray')
+im4 = ax4.imshow(grab_frame(cap1, 4), cmap='gray')
+
+
+ani = FuncAnimation(plt.gcf(), update, interval=1, repeat=False)
+
+plt.subplots_adjust(wspace=0, hspace=0.3)
+plt.show()
